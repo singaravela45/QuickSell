@@ -136,10 +136,10 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Yearly Stats */}
-        <div className="bg-[#0a0c10] p-8 rounded-[2rem] shadow-xl flex flex-col justify-between group transition-all">
+        <div className="bg-[#ffffff] p-8 rounded-[2rem] shadow-xl flex flex-col justify-between group transition-all">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Revenue (CY {new Date().getFullYear()})</p>
           <div>
-            <p className="text-3xl font-black text-white tracking-tighter">₹{metrics.yearlyRevenue.toLocaleString()}</p>
+            <p className="text-3xl font-black text-indigo-400 tracking-tighter">₹{metrics.yearlyRevenue.toLocaleString()}</p>
             <div className="mt-2 flex items-center">
               <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mr-2"></span>
               <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Annual Gross Ledger</p>
@@ -147,7 +147,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-[#0a0c10] p-8 rounded-[2rem] shadow-xl flex flex-col justify-between group transition-all">
+        <div className="bg-[#ffffff] p-8 rounded-[2rem] shadow-xl flex flex-col justify-between group transition-all">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Profit (CY {new Date().getFullYear()})</p>
           <div>
             <p className="text-3xl font-black text-indigo-400 tracking-tighter">₹{metrics.yearlyProfit.toLocaleString()}</p>
