@@ -1,19 +1,13 @@
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { dbService } from '../services/dbService';
 import { Product, Sale } from '../types';
 
-/**
- * 📊 DASHBOARD COMPONENT
- * Purpose: Aggregates real-time data for business intelligence.
- */
 const Dashboard: React.FC = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Initial Data Load
   useEffect(() => {
     const loadAllData = async () => {
       try {
@@ -32,24 +26,16 @@ const Dashboard: React.FC = () => {
     loadAllData();
   }, []);
 
-  /**
-   * 🧮 KPI CALCULATIONS
-   * Logic for calculating daily and yearly revenue/profit, and stock alerts.
-   */
   const metrics = useMemo(() => {
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
-
     const todaySales = sales.filter(s => s.timestamp >= startOfToday);
     const yearSales = sales.filter(s => s.timestamp >= startOfYear);
-
     const dailyRevenue = todaySales.reduce((sum, s) => sum + s.totalAmount, 0);
     const dailyProfit = todaySales.reduce((sum, s) => sum + s.profit, 0);
-    
     const yearlyRevenue = yearSales.reduce((sum, s) => sum + s.totalAmount, 0);
     const yearlyProfit = yearSales.reduce((sum, s) => sum + s.profit, 0);
-
     const lowStockAlerts = products.filter(p => p.stockQty <= p.reorderLevel);
 
     return {
@@ -62,15 +48,10 @@ const Dashboard: React.FC = () => {
     };
   }, [sales, products]);
 
-  /**
-   * 📈 CHART DATA PREPARATION
-   * Logic for grouping revenue into monthly buckets for the current year.
-   */
   const chartData = useMemo(() => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const buckets = months.map(m => ({ label: m, value: 0 }));
     const currentYear = new Date().getFullYear();
-
     sales.forEach(sale => {
       const saleDate = new Date(sale.timestamp);
       if (saleDate.getFullYear() === currentYear) {
@@ -78,7 +59,6 @@ const Dashboard: React.FC = () => {
         buckets[monthIndex].value += sale.totalAmount;
       }
     });
-
     return buckets;
   }, [sales]);
 
@@ -90,11 +70,9 @@ const Dashboard: React.FC = () => {
       </div>
     );
   }
-
   return (
     <div className="h-full flex flex-col space-y-8 animate-fadeIn overflow-y-auto no-scrollbar pb-10">
-      
-      {/* HEADER: Dynamic Status */}
+
       <div className="flex justify-between items-center shrink-0">
         <div className="flex items-center space-x-5">
           <div className="w-14 h-14 bg-indigo-600 rounded-3xl flex items-center justify-center shadow-xl shadow-indigo-100">
@@ -102,15 +80,12 @@ const Dashboard: React.FC = () => {
           </div>
           <div>
             <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase leading-none">Dashboard</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-2">Enterprise Resource Monitor</p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full border border-emerald-100">System Live</p>
         </div>
       </div>
 
-      {/* KPI GRID */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 shrink-0">
         {/* Daily Stats */}
         <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-between group hover:border-indigo-100 transition-all">
@@ -123,11 +98,10 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
-
         <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-between group hover:border-emerald-100 transition-all">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Profit Today</p>
           <div>
-            <p className="text-3xl font-black text-emerald-600 tracking-tighter">₹{metrics.dailyProfit.toLocaleString()}</p>
+            <p className="text-3xl font-black text-black-600 tracking-tighter">₹{metrics.dailyProfit.toLocaleString()}</p>
             <div className="mt-2 flex items-center">
               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-2"></span>
               <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">Net Margin Today</p>
@@ -135,22 +109,20 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Yearly Stats */}
         <div className="bg-[#ffffff] p-8 rounded-[2rem] shadow-xl flex flex-col justify-between group transition-all">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Revenue (CY {new Date().getFullYear()})</p>
           <div>
-            <p className="text-3xl font-black text-indigo-400 tracking-tighter">₹{metrics.yearlyRevenue.toLocaleString()}</p>
+            <p className="text-3xl font-black text-black tracking-tighter">₹{metrics.yearlyRevenue.toLocaleString()}</p>
             <div className="mt-2 flex items-center">
               <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mr-2"></span>
               <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Annual Gross Ledger</p>
             </div>
           </div>
         </div>
-
         <div className="bg-[#ffffff] p-8 rounded-[2rem] shadow-xl flex flex-col justify-between group transition-all">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Profit (CY {new Date().getFullYear()})</p>
           <div>
-            <p className="text-3xl font-black text-indigo-400 tracking-tighter">₹{metrics.yearlyProfit.toLocaleString()}</p>
+            <p className="text-3xl font-black text-black-400 tracking-tighter">₹{metrics.yearlyProfit.toLocaleString()}</p>
             <div className="mt-2 flex items-center">
               <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full mr-2"></span>
               <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Annual Yield</p>
@@ -159,10 +131,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* DATA VISUALIZATIONS */}
       <div className="flex-1 min-h-[400px] grid grid-cols-12 gap-8">
-        
-        {/* Trend Analysis */}
         <div className="col-span-12 lg:col-span-8 bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col">
           <div className="mb-8 flex justify-between items-end">
             <div>
@@ -207,8 +176,6 @@ const Dashboard: React.FC = () => {
             </ResponsiveContainer>
           </div>
         </div>
-
-        {/* Inventory Critical Alerts */}
         <div className="col-span-12 lg:col-span-4 flex flex-col space-y-5">
            <div className="flex justify-between items-center px-2">
              <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Stock Ledger Alerts</h3>

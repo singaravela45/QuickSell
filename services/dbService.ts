@@ -1,9 +1,16 @@
+
 import { Product, Sale } from '../types';
 const SERVER_URL = process.env.SERVER_URL || ''; 
+
 const STORAGE_KEYS = {
   PRODUCTS: 'quicksell_inv_v1',
   SALES: 'quicksell_sales_v1',
 };
+
+/** 
+ * Default Startup Data
+ * Stationery shop inventory for display purposes.
+ */
 const DEFAULT_PRODUCTS: Product[] = [
   { id: 'P-001', name: 'Executive Fountain Pen', sku: 'EP-FONT-01', category: 'Writing', company: 'Luxor', costPrice: 450, sellingPrice: 899, stockQty: 12, reorderLevel: 5 },
   { id: 'P-002', name: 'Premium A5 Leather Notebook', sku: 'NB-A5-PREM', category: 'Paper', company: 'Classmate', costPrice: 120, sellingPrice: 350, stockQty: 45, reorderLevel: 10 },
@@ -20,31 +27,43 @@ const generateDefaultSales = (products: Product[]): Sale[] => {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
+  
+  // Generate data for each month up to today
   for (let m = 0; m <= currentMonth; m++) {
-    const salesThisMonth = Math.floor(Math.random() * 6) + 3;    
+    // Generate 3-8 random sales per month
+    const salesThisMonth = Math.floor(Math.random() * 6) + 3;
+    
     for (let i = 0; i < salesThisMonth; i++) {
       const day = Math.floor(Math.random() * 28) + 1;
-      if (m === currentMonth && day > now.getDate()) continue;      
+      // If it's current month, don't generate sales in the future
+      if (m === currentMonth && day > now.getDate()) continue;
+      
       const date = new Date(currentYear, m, day, 10 + Math.floor(Math.random() * 8), Math.floor(Math.random() * 60));
-      const timestamp = date.getTim    
+      const timestamp = date.getTime();
+      
+      // Pick 1-3 random products for the cart
       const itemCount = Math.floor(Math.random() * 3) + 1;
       const cartItems = [];
       let totalAmount = 0;
       let totalProfit = 0;
       let totalDiscountAmount = 0;
+
       for (let j = 0; j < itemCount; j++) {
         const prod = products[Math.floor(Math.random() * products.length)];
         const qty = Math.floor(Math.random() * 3) + 1;
         const discount = Math.random() > 0.8 ? 10 : 0; // 20% chance of 10% discount
+        
         const discountedPrice = prod.sellingPrice * (1 - discount / 100);
         const itemTotal = discountedPrice * qty;
         const itemProfit = (discountedPrice - prod.costPrice) * qty;
         const itemDiscountVal = (prod.sellingPrice * (discount / 100)) * qty;
+
         cartItems.push({ ...prod, quantity: qty, discount });
         totalAmount += itemTotal;
         totalProfit += itemProfit;
         totalDiscountAmount += itemDiscountVal;
       }
+
       sales.push({
         id: `SALE-${date.getMonth()+1}${date.getDate()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
         timestamp,
@@ -56,9 +75,13 @@ const generateDefaultSales = (products: Product[]): Sale[] => {
       });
     }
   }
+  
   return sales.sort((a, b) => b.timestamp - a.timestamp);
 };
 
+/** 
+ * LocalStorage Fallback Helpers 
+ */
 const getLocalData = <T>(key: string, fallback: T): T => {
   const data = localStorage.getItem(key);
   if (!data) {

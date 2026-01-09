@@ -55,12 +55,8 @@ const App: React.FC = () => {
                 </svg>
               </button>
             )}
-          
+            
             <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight ml-2">{activePage}</h2>
-          </div>
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse mr-2"></div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Active</span>
           </div>
         </header>
 
